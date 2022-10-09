@@ -1,0 +1,101 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>This is node js node js mongo bd project</h1>
+
+    <form action="/addProduct" method="post">
+        <input type="text" placeholder="Name" name="name" id="">
+        <input type="text" placeholder="Price" name="price" id="">
+        <input type="text" placeholder="Quantity" name="quantity" id="">
+        <button type="submit">Add Product</button>
+    </form>
+    <div id="products">
+
+    </div>
+
+    <div id="product">
+
+    </div>
+    <script>
+        // Data read in Database start........
+        function loadAllProducts() {
+            fetch('/products')
+                .then(res => res.json())
+                .then(product => {
+                    console.log(product)
+                    const container = document.getElementById('products')
+                    product.forEach(pd => {
+
+                        const p = document.createElement('p')
+                        p.innerHTML = `<b>${pd.name} </b> -- quantity: ${pd.quantity} -- price:${pd.price}
+                        <button onclick="loadProduct('${pd._id}')">Edit</button>
+                        <button onclick="deleteProduct('${pd._id}')">Delete</button>
+                        `
+                        container.appendChild(p)
+                    });
+
+                    // Data read in Database end........
+
+                })
+        }
+        loadAllProducts()
+        // Data delete in Database start........
+
+        function deleteProduct(id) {
+            console.log(id)
+            fetch(`/delete/${id}`, {
+                method: 'DELETE'
+            })
+
+                .then(res => res.json())
+                .then(result => {
+                    console.log("delete succesfull")
+                })
+        }
+
+        // Data delete in Database end........
+
+
+        function loadProduct(id) {
+            fetch(`/product/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    const update = document.getElementById('product');
+                    update.innerHTML = `
+                    <h3>Update: ${data._id}</h3>
+                    <input type="text" value="${data.name}"  id="name">
+                    <input type="text" value="${data.price}"  id="price">
+                    <input type="text" value="${data.quantity}"  id="quantity">
+                    <button onclick= "updateProduct('${data._id}')">Update</button>
+                    
+                `
+                })
+        }
+
+
+        function updateProduct(id) {
+            const name = document.getElementById('name').value;
+            const price = document.getElementById('price').value;
+            const quantity = document.getElementById('quantity').value;
+            const product = { id, name, price, quantity }
+            console.log(product)
+            fetch(`/update/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-type': 'application/json; charset=UTF-8'},
+                body: JSON.stringify(product)
+            })
+
+        }
+
+
+    </script>
+</body>
+
+</html>
